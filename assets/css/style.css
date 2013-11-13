@@ -1,0 +1,22 @@
+body {
+    width: 940px;
+    margin: 0 auto;
+}
+
+.content {
+    width: 60%;
+    float: left;
+}
+
+.sidebar {
+    width: 35%;
+    float: right;
+}
+
+.chickletButton {
+    padding: 5px;
+    border: 1px solid #CCC;
+    display: inline-block;
+    border-radius: 5px;
+    background: #AF8;
+}
