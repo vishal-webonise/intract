@@ -7,9 +7,10 @@
         <script src="jquery-1.10.2.js"></script>
     </head>
     <body>
+
       <div id="intract"></div>
       <script type="text/javascript">
-        var intract_remote_path = "intract.t.proxylocal.com/lib";
+        var intract_remote_path = "10.0.0.137:5234/lib"; // REMOVE
         (function(){
           var intrct = document.createElement('script');
           intrct.type = 'text/javascript';
@@ -19,6 +20,7 @@
           s.parentNode.insertBefore(intrct, s);
         })();
       </script>
+
       <script type="text/javascript">
         console.log("do not block me content " + new Date); // REMOVE
       </script>
