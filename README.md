@@ -1,7 +1,4 @@
-```bash
-gem install proxylocal
-python -m SimpleHTTPServer 5234
-proxylocal 5234 --host intract
-```
 
-Access app here: `http://intract.t.proxylocal.com/`
+- Start webserver on 5234 port, e.g. `python -m SimpleHTTPServer 5234`
+- Access app here: `localhost:5234`
+- Open web browser's inspector -> javascript console

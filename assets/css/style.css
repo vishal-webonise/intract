@@ -20,3 +20,26 @@ body {
     border-radius: 5px;
     background: #AF8;
 }
+
+.chickletPopover {
+  margin-left: -999em;
+  position: absolute;
+}
+
+/*.chickletButton:hover*/ .chickletPopover {
+  position: absolute;
+  left: 17em;
+  top: 6em;
+  z-index: 99;
+  margin-left: 0;
+  width: 250px;
+  background: #EFE;
+  padding: 40px;
+  font-size: 90%;
+  border-radius: 5px 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 5px 5px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 5px 5px rgba(0, 0, 0, 0.1);
+}
