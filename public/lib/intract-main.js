@@ -190,6 +190,7 @@ var Intract = Intract || {};
         xhr = new XMLHttpRequest();
         if ( "withCredentials" in xhr ) {
             xhr.open( method, url, true );
+            if ( method === 'DELETE' ) { xhr.withCredentials = true; }
         }
         else if ( typeof XDomainRequest !== "undefined" ) { // IE < 8
             xhr = new XDomainRequest();
@@ -199,6 +200,9 @@ var Intract = Intract || {};
             xhr = null; // unsupported browser
         }
 
+        // send cookies
+        
+        
         var _tmp = (function( req ) {
             if (req) {
                 req.onreadystatechange = function() {
@@ -449,7 +453,16 @@ var Intract = Intract || {};
             makeCORSRequest( intractServerBaseUrl + '/create_should_succeed', 'POST');
 
             // make a CORS request which is assumed to fail, no access-control-allow-origin header in response is sent
-            makeCORSRequest( intractServerBaseUrl + '/create_should_fail', 'POST')
+            makeCORSRequest( intractServerBaseUrl + '/create_should_fail', 'POST');
+            
+            // set cookie
+            document.cookie = "fakeUser=blah"+Math.random()+";path=/";
+
+            // CORS request to read cookies -- fails
+            makeCORSRequest( intractServerBaseUrl + '/logout_should_fail', 'DELETE' );
+
+            // CORS request to read cookies -- succeed
+            makeCORSRequest( intractServerBaseUrl + '/logout_should_succeed', 'DELETE' );
         },
 
         locateChicklets: function() {
