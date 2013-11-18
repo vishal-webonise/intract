@@ -182,7 +182,7 @@ var Intract = Intract || {};
 
     // Function for making cross-browser AJAX using CORS
     // Returns xhr object
-    function makeCORSRequest( url, method ) {
+    function makeCORSRequest( url, method, fn ) {
         // does browser support AJAX
         if ( XMLHttpRequest === "undefined" ) { return null }
 
@@ -190,7 +190,6 @@ var Intract = Intract || {};
         xhr = new XMLHttpRequest();
         if ( "withCredentials" in xhr ) {
             xhr.open( method, url, true );
-            if ( method === 'DELETE' ) { xhr.withCredentials = true; }
         }
         else if ( typeof XDomainRequest !== "undefined" ) { // IE < 8
             xhr = new XDomainRequest();
@@ -200,20 +199,9 @@ var Intract = Intract || {};
             xhr = null; // unsupported browser
         }
 
-        // send cookies
+        // execute if fn is passed
+        if ( typeof fn === "function" ) { fn( xhr ); }
         
-        
-        var _tmp = (function( req ) {
-            if (req) {
-                req.onreadystatechange = function() {
-                    if (req.readyState == 4 && req.status == 200) {
-                        log( req.responseText );
-                    }
-                };
-                req.send();
-            }
-        })(xhr);
-
         return xhr;
     }
 
@@ -450,19 +438,43 @@ var Intract = Intract || {};
             var intractServerBaseUrl = "http://localhost:7890";
 
             // do a CORS request which is assumed to succeed - origin and access-control-allow-origin matches            
-            makeCORSRequest( intractServerBaseUrl + '/create_should_succeed', 'POST');
+            makeCORSRequest( intractServerBaseUrl + '/create_should_succeed', 'POST', function( req ) {
+                if (req) {
+                    req.onreadystatechange = function() {
+                        if (req.readyState == 4 && req.status == 200) {
+                            log( req.responseText );
+                        }
+                    };
+                    req.send();
+                }
+            });
 
             // make a CORS request which is assumed to fail, no access-control-allow-origin header in response is sent
-            makeCORSRequest( intractServerBaseUrl + '/create_should_fail', 'POST');
+            makeCORSRequest( intractServerBaseUrl + '/create_should_fail', 'POST', function(req){ req.send(); });
             
             // set cookie
             document.cookie = "fakeUser=blah"+Math.random()+";path=/";
 
             // CORS request to read cookies -- fails
-            makeCORSRequest( intractServerBaseUrl + '/logout_should_fail', 'DELETE' );
+            makeCORSRequest( intractServerBaseUrl + '/logout_should_fail', 'POST', function(req){
+                req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                req.withCredentials = true; // attach cookie header in request
+                req.send('_method=delete');
+            });
 
             // CORS request to read cookies -- succeed
-            makeCORSRequest( intractServerBaseUrl + '/logout_should_succeed', 'DELETE' );
+            makeCORSRequest( intractServerBaseUrl + '/logout_should_succeed', 'POST',  function( req ) {
+                if (req) {
+                    req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    req.withCredentials = true; // attach cookie header in request
+                    req.onreadystatechange = function() {
+                        if (req.readyState == 4 && req.status == 200) {
+                            log( req.responseText );
+                        }
+                    };
+                    req.send('_method=delete');
+                }
+           });
         },
 
         locateChicklets: function() {

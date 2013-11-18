@@ -1,6 +1,8 @@
 require 'sinatra'
 
 class IntractServerApp < Sinatra::Base
+  use Rack::MethodOverride
+  use Rack::Logger
   # start the server if this file executed directly
   run! if app_file == $0
 
@@ -11,13 +13,12 @@ class IntractServerApp < Sinatra::Base
   end
 
   get '/' do
-    puts request["Origin"]
     body "IntractServerApp running well!"
     end
   
   post '/create_should_succeed' do
     origin = request.env["HTTP_ORIGIN"]
-    puts origin
+    logger.info origin
     header_opts = {}
 
     # allow cross domain access to publisher site
@@ -30,55 +31,34 @@ class IntractServerApp < Sinatra::Base
 
   post '/create_should_fail' do
     origin = request.env["HTTP_ORIGIN"]
-    puts origin
+    logger.info origin
 
     status 200
     body "I bet you never gonna see this! :P"
   end
 
-  options '/logout_should_succeed' do
-    origin = request.env["HTTP_ORIGIN"]
-    user = request.cookies["fakeUser"]
-    puts origin + " " + user.to_s
-    header_opts = {}
-    # allow cross domain access to publisher site
-    header_opts["Access-Control-Allow-Origin"] = origin
-    header_opts["Access-Control-Allow-Methods"] = 'DELETE, OPTIONS'
-    header_opts['Access-Control-Request-Method'] = '*'
-header_opts['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-    # cookies are expected in this request
-    header_opts['Access-Control-Allow-Credentials'] = 'true'
-    headers header_opts
-    status 200
-  end
-
-
   delete '/logout_should_succeed' do
     origin = request.env["HTTP_ORIGIN"]
     user = request.cookies["fakeUser"]
-    puts "in delete: " + origin + " " + user.to_s
+    logger.info "IN DELETE >>>>>>>>>> : " + origin + " " + user.to_s
     header_opts = {}
-    header_opts["Access-Control-Allow-Origin"] ="http://localhost:5234"
+    header_opts["Access-Control-Allow-Origin"] = origin if @allowed_publishers.include? origin
     # cookies are expected in this request
     header_opts['Access-Control-Allow-Credentials'] = 'true'
     headers header_opts
     status 200
     body "This is DELETE xhr request's response - #{user} (see fakeUser cookie)"
-end
+  end
 
-  options '/logout_should_fail' do
+  delete '/logout_should_fail' do
     origin = request.env["HTTP_ORIGIN"]
     user = request.cookies["fakeUser"]
-    puts origin + " " + user.to_s
+    logger.info "IN DELETE >>>>>>>>>> : " + origin + " " + user.to_s
     header_opts = {}
-    # allow cross domain access to publisher site
     header_opts["Access-Control-Allow-Origin"] = origin if @allowed_publishers.include? origin
-    header_opts["Access-Control-Allow-Methods"] = 'DELETE, OPTIONS'
-    header_opts['Access-Control-Request-Method'] = '*'
-header_opts['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
     headers header_opts
     status 200
-    body "not reachable"
+    body "never gonna happen !"
   end
 end
 
