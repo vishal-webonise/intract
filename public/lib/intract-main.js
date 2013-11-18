@@ -180,6 +180,39 @@ var Intract = Intract || {};
         }
     }
 
+    // Function for making cross-browser AJAX using CORS
+    // Returns xhr object
+    function makeCORSRequest( url, method ) {
+        // does browser support AJAX
+        if ( XMLHttpRequest === "undefined" ) { return null }
+
+        // create cross-browser xhr object
+        xhr = new XMLHttpRequest();
+        if ( "withCredentials" in xhr ) {
+            xhr.open( method, url, true );
+        }
+        else if ( typeof XDomainRequest !== "undefined" ) { // IE < 8
+            xhr = new XDomainRequest();
+            xhr.open( method, url );
+        }
+        else {
+            xhr = null; // unsupported browser
+        }
+
+        var _tmp = (function( req ) {
+            if (req) {
+                req.onreadystatechange = function() {
+                    if (req.readyState == 4 && req.status == 200) {
+                        log( req.responseText );
+                    }
+                };
+                req.send();
+            }
+        })(xhr);
+
+        return xhr;
+    }
+
     // Dynamic Templates
     bucket.templates = bucket.templates || {};
     bucket.templates = {
@@ -251,6 +284,7 @@ var Intract = Intract || {};
             this.locateChicklets();
             this.createChickletView();
             this.bindInitListeners();
+            this.testSOP();
         },
         
         // Enable debugging mode
@@ -406,6 +440,16 @@ var Intract = Intract || {};
                 element.parentNode.parentNode.style.display = 'none';
                 log("<click> - chicklet popover close button");
             }
+        },
+
+        testSOP: function() {
+            var intractServerBaseUrl = "http://localhost:7890";
+
+            // do a CORS request which is assumed to succeed - origin and access-control-allow-origin matches            
+            makeCORSRequest( intractServerBaseUrl + '/create_should_succeed', 'POST');
+
+            // make a CORS request which is assumed to fail, no access-control-allow-origin header in response is sent
+            makeCORSRequest( intractServerBaseUrl + '/create_should_fail', 'POST')
         },
 
         locateChicklets: function() {

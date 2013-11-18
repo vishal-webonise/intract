@@ -1,4 +1,5 @@
-
-- Start webserver on 5234 port, e.g. `python -m SimpleHTTPServer 5234`
-- Access app here: `localhost:5234`
-- Open web browser's inspector -> javascript console
+- `gem install sinatra`
+- Goto project root and run `rackup -p 7890` to start script serving server
+- Goto `publishers/publisher_one` directory and start webserver on 5234 port, e.g. `python -m SimpleHTTPServer 5234`
+- Now access publisher's website here: `localhost:5234`
+- Open web browser's inspector -> and see logs in javascript console
